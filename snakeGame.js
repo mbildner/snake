@@ -3,8 +3,10 @@
 // controller
 
 
+
 var Canvas = function(canvasID, background){
 	var canvas = document.getElementById(canvasID);
+
 	// don't make the actual canvas node public, the game doesn't need to know about it
 	this.width = canvas.getAttribute('width');
 	this.height = canvas.getAttribute('height');
@@ -16,6 +18,9 @@ var Canvas = function(canvasID, background){
 var VirtualGrid = function(rows, cols, canvas){
 	var grid = [];
 
+	// var sizeX = canvas.height/rows;
+	// var sizeY = canvas.width/cols;
+
 	for (var r=0; r<rows; r++){
 		var currentRow = [];
 		grid.push(currentRow);
@@ -25,9 +30,24 @@ var VirtualGrid = function(rows, cols, canvas){
 		}
 	}
 
+	// set every column in the top and bottm edges to occuppied
+
 	var topEdge = grid[0];
 	var bottomEdge = grid[grid.length-1];
 
+	[topEdge, bottomEdge].forEach(function(edgeArray){
+		edgeArray.forEach(function(square){
+			square.occuppied = true;
+		})
+	});
+
+	for (var r=0; r<rows; r++){
+		var row = grid[r];
+		var firstSquare = row[0];
+		firstSquare.occuppied = true;
+		var lastSquare = row[row.length-1];
+		lastSquare.occuppied = true;
+		}
 	// fill the top and bottom edges with blocks then call them to render in the view
 
 	return grid;
@@ -54,40 +74,19 @@ var Block = function(x, y, sizeX, sizeY, color, canvas){
 	return this;
 }
 
-
-var keyPressDirections = {
-	"37" : "left",
-	"38" : "up",
-	"39" : "right",
-	"40" : "down"
-}
-
-var snakeBlockSize = 20;
-
-var directions = {
-	"up": {x:0, y:-20},
-	"down": {x:0, y:+20},
-	"left": {x:-20, y:0},
-	"right": {x:+20, y:0}
-}
-
-
 var Snake = function(blockArray){
 	var path = blockArray;
-
 	// start the snake moving to the right, for convenience.  this can be changed later by the developer at will.
 	var direction = "right";
 
 	var move = function(direction){
-
 		// add a test condition to prevent the snake from "turning" back on itself by reversing direction 
-		var moveDirection = directions[direction];
-
+		var moveDirection = controller.directions[direction];
 		// grab old head so we can use its x and y coordinates to set the new head
 		var oldTail = path.pop();
 		oldTail.erase(canvas);
 		var oldHead = path[0];
-		var newHead = new Block(oldHead.x, oldHead.y , snakeBlockSize, snakeBlockSize, "black", canvas)
+		var newHead = new Block(oldHead.x, oldHead.y ,  gameBlockXSize, gameBlockYSize, "black", canvas)
 		newHead.x += moveDirection.x;
 		newHead.y += moveDirection.y;
 
@@ -104,6 +103,17 @@ var Snake = function(blockArray){
 	this.direction = direction;
 
 	return this;
+}
+
+
+var collisionCheckGrid = function(x, y, canvas, grid){
+	var col = Math.floor(x * ((grid[0].length) / canvas.width));
+	var row = Math.floor(y * ((grid.length) / canvas.height));
+	
+	var gridBox = grid[row][col];
+	if (gridBox.occuppied){
+		endGame();
+	}
 }
 
 var collisionCheck = function(blockArray, block){
@@ -134,36 +144,67 @@ var GameBoardView = function(canvas, grid, snake){
 
 function GameController(snake, canvas, grid, view){
 
+	var initializeSnakePath = function(x, y, length, direction){
+		var path = [];
+		var initX = x;
+		var initY = y;
+		// start building the blocks at (x, y) and make each variable bigger accordingly
+		for (var l=0; l<length; l++){
+			var bodyBlock = new Block(x, y, sizeX, sizeY, color, canvas);
+			path.push(bodyBlock);
+		}
+	}
+
+	var keyPressDirections = {
+	"37" : "left",
+	"38" : "up",
+	"39" : "right",
+	"40" : "down"
+	}
+
+	var directions = {
+		"up": {x:0, y:-gameBlockYSize},
+		"down": {x:0, y:+gameBlockYSize},
+		"left": {x:-gameBlockXSize, y:0},
+		"right": {x:+gameBlockXSize, y:0}
+	}
+
+	this.directions = directions;
+	this.keyPressDirections = keyPressDirections;
+
 }
 
 
 // instantiate game objects
 
-// block array gameboard cnvas
+// block array gameboard canvas
 var canvas = new Canvas("snakeGameCanvas", "white");
 
-// var Block = function(x, y, sizeX, sizeY, color, canvas){
+// var rowNumber = canvas.height/totalGameRowNumber;
+// var colNumber = canvas.width/totalGameColumnNumber;
 
-var startingSnake = [new Block(120, 10, snakeBlockSize, snakeBlockSize, "black", canvas), new Block(100, 10, snakeBlockSize, snakeBlockSize, "black", canvas), new Block(80, 10, snakeBlockSize, snakeBlockSize, "black", canvas), new Block(60, 10, snakeBlockSize, snakeBlockSize, "black", canvas), new Block(40, 10, snakeBlockSize, snakeBlockSize, "black", canvas)];
+rowNumber = 50;
+colNumber = 50;
+
+var gameBlockXSize = canvas.width/rowNumber;
+var gameBlockYSize = canvas.height/colNumber;
+
+var startingSnake = [new Block(120, 10, gameBlockXSize, gameBlockYSize, "black", canvas), new Block(100, 10,  gameBlockXSize, gameBlockYSize, "black", canvas), new Block(80, 10,  gameBlockXSize, gameBlockYSize, "black", canvas), new Block(60, 10,  gameBlockXSize, gameBlockYSize, "black", canvas), new Block(40, 10,  gameBlockXSize, gameBlockYSize, "black", canvas)];
+
 
 var snake = new Snake(startingSnake);
-
-// the canvas should have height/10 rows and width/10 columns
-
-var rowNumber = canvas.height/10;
-var colNumber = canvas.width/10;
-
 var grid = new VirtualGrid(rowNumber, colNumber, canvas);
 var view = new GameBoardView(canvas, grid, snake);
+var controller = new GameController(snake, canvas, grid, view);
 
 
 document.body.addEventListener("keydown", function(press){
 	// press.which will be a number, translate it to one of our directions, so we can pass it to the snake to move it
-	var direction = keyPressDirections[press.which.toString()];
-	snake.direction = direction;
+	var directionSignal = press.which;
+
+	snake.direction = controller.keyPressDirections[directionSignal.toString()];
 
 })
-
 
 var endGame = function(){
 	window.clearInterval(gameLoop);
@@ -173,14 +214,17 @@ var cycleGame = function(){
 	if (collisionCheck(snake.path.slice(1, snake.path.length), snake.path[0])){
 		endGame();
 	}
+
+	// the snake head should get its row and column calculated instead of as raw x, y (or in addition)
+
+	collisionCheckGrid(snake.path[0].x, snake.path[0].y, canvas, grid);
 	snake.move(snake.direction);
 	view.updateView();
 }
 
+var refreshRate = 50;
 
-var frameRate = 50;
-
-var gameLoop = window.setInterval(cycleGame, frameRate);
+var gameLoop = window.setInterval(cycleGame, refreshRate);
 
 var killGameButton = document.getElementById("killGameButton");
 killGameButton.addEventListener("click", function(){window.clearInterval(gameLoop);})
