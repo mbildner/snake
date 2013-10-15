@@ -11,11 +11,7 @@ var GridBox = function(row, col, width, height){
 	}
 
 	this.erase = function(){
-		context.save();
-		context.scale(1.1, 1.1);
 		this.render(canvas.backgroundColor);
-		context.restore();
-
 	}
 }
 
