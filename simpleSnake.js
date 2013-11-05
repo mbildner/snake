@@ -7,14 +7,18 @@
 	  this.collideable = false;
 
 	  this.render = function(color){
+  var GridView = function(colWidth, rowHeight, backgroundColor) {
+    this.renderBox = function(box, color) {
 		  context.fillStyle = color;
-		  context.fillRect(row*height, col*width, width, height, color)
-	  }
+		  context.fillRect(box.row*rowHeight, box.col*colWidth,
+                       colWidth, rowHeight,
+                       color);
+    };
 
-	  this.erase = function(){
-		  this.render(canvas.backgroundColor);
-	  }
-  }
+    this.eraseBox = function(box) {
+      this.renderBox(box, backgroundColor);
+    };
+  };
 
   var GridModel = function(rows, cols, colWidth, rowHeight){
 	  this.rows = rows;
