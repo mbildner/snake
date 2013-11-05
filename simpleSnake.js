@@ -20,11 +20,11 @@
 	  this.rows = rows;
 	  this.cols = cols;
 
-	  this.grid = [];
+	  var grid = [];
 
 	  for (var row=0; row<rows; row++){
 		  var currentRow = [];
-		  this.grid.push(currentRow);
+		  grid.push(currentRow);
 		  for (var col=0; col<cols; col++){
 			  var box = new GridBox(row, col, colWidth, rowHeight);
 			  currentRow.push(box);
@@ -32,15 +32,18 @@
 		  }
 	  }
 
+    this.getBox = function(row, col) {
+      return grid[row][col];
+    };
 
 	  this.randomBox = function(){
 		  var randBox = {};
 		  randBox.collideable = true;
 
 		  while (randBox.collideable){
-			  var randRow = Math.floor(Math.random()*this.grid.length);
-			  var randCol = Math.floor(Math.random()*this.grid[0].length);
-			  var randBox = this.grid[randRow][randCol];
+			  var randRow = Math.floor(Math.random()*grid.length);
+			  var randCol = Math.floor(Math.random()*grid[0].length);
+			  var randBox = grid[randRow][randCol];
 		  }
 
 		  console.log(randBox);
@@ -50,17 +53,17 @@
 	  // Canvas setup code - put it in a this.init function
 
 	  // set edges to collideable and render them black
-	  this.grid[0].forEach(function(box){
+	  grid[0].forEach(function(box){
 		  box.collideable = true;
 		  box.render("black");
 	  });
 
-	  this.grid[this.grid.length-1].forEach(function(box){
+	  grid[grid.length-1].forEach(function(box){
 		  box.collideable = true;
 		  box.render("black");
 	  });
 
-	  this.grid.forEach(function(row){
+	  grid.forEach(function(row){
 		  row[0].collideable = true;
 		  row[row.length-1].collideable = true;
 		  row[0].render("black");
@@ -104,7 +107,7 @@
 
 	  this.collisionCheck = function(){
 		  head = this.body[0];
-		  var headGridBox = gridModel.grid[head.row][head.col];
+		  var headGridBox = gridModel.getBox(head.row, head.col);
 		  var collision = headGridBox.collideable;
 		  if (collision){
 			  if (headGridBox.food){
@@ -134,21 +137,21 @@
 		  }
 
 		  this.body.push(newTail);
-		  var newTailBlock = gridModel.grid[newTail.row][newTail.col];
+		  var newTailBlock = gridModel.getBox(newTail.row, newTail.col);
 		  newTailBlock.render("lime");
 
 	  }
 
 	  this.direction = "Right";
 	  this.body.forEach(function(block){
-		  var gridBox = gridModel.grid[block.row][block.col];
+		  var gridBox = gridModel.getBox(block.row, block.col);
 		  gridBox.render("lime");
 	  })
 
 	  this.move = function(direction){
 		  var tail = this.body.pop();
 
-		  gridModel.grid[tail.row][tail.col].erase();
+		  gridModel.getBox(tail.row, tail.col).erase();
 
 		  // var directionsDict = {
 		  // 	"Left": {"col": -1, "row":0},
@@ -177,7 +180,7 @@
 		  newHead.col += this.directionsDict[direction]["col"];
 		  this.body = [newHead].concat(this.body);
 
-		  gridModel.grid[newHead.row][newHead.col].render("lime");
+		  gridModel.getBox(newHead.row, newHead.col).render("lime");
 
 	  }
   }
