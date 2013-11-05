@@ -79,29 +79,22 @@
 
 	  // Canvas setup code - put it in a this.init function
 
-	  // set edges to collideable and render them black
 	  grid[0].forEach(function(box){
-		  box.collideable = true;
-		  box.render("black");
+		  box.setAsWall()
 	  });
 
 	  grid[grid.length-1].forEach(function(box){
-		  box.collideable = true;
-		  box.render("black");
+		  box.setAsWall()
 	  });
 
 	  grid.forEach(function(row){
-		  row[0].collideable = true;
-		  row[row.length-1].collideable = true;
-		  row[0].render("black");
-		  row[row.length-1].render("black");
+      row[0].setAsWall();
+      row[row.length-1].setAsWall();
 	  });
 
 	  // set a block to have food, make it collideable, and render it blue
-	  var foodBlock = this.randomBox();
-	  foodBlock.collideable = true;
-	  foodBlock.food = true;
-	  foodBlock.render("blue");
+	  var foodBlock = this.randomEmptyBox();
+	  foodBlock.setAsFood();
   }
 
 
@@ -141,12 +134,9 @@
 				  // grow the snake; it ate food
 				  snake.grow();
 				  // set the food key to false and reset it randomly
-				  headGridBox.food = false;
-				  headGridBox.collideable = false;
-				  var newFood = gridModel.randomBox();
-				  newFood.collideable = true;
-				  newFood.food = true;
-				  newFood.render("blue");
+				  headGridBox.reset();
+				  var newFood = gridModel.randomEmptyBox();
+          newFood.setAsFood();
 			  } else {
 				  // kill the snake, it hit something it shouldn't
 				  window.clearInterval(gameLoopHandle);
@@ -165,20 +155,19 @@
 
 		  this.body.push(newTail);
 		  var newTailBlock = gridModel.getBox(newTail.row, newTail.col);
-		  newTailBlock.render("lime");
-
+		  newTailBlock.setAsSnake();
 	  }
 
 	  this.direction = "Right";
 	  this.body.forEach(function(block){
 		  var gridBox = gridModel.getBox(block.row, block.col);
-		  gridBox.render("lime");
+		  gridBox.setAsSnake();
 	  })
 
 	  this.move = function(direction){
 		  var tail = this.body.pop();
 
-		  gridModel.getBox(tail.row, tail.col).erase();
+		  gridModel.getBox(tail.row, tail.col).reset();
 
 		  // var directionsDict = {
 		  // 	"Left": {"col": -1, "row":0},
@@ -207,7 +196,7 @@
 		  newHead.col += this.directionsDict[direction]["col"];
 		  this.body = [newHead].concat(this.body);
 
-		  gridModel.getBox(newHead.row, newHead.col).render("lime");
+		  gridModel.getBox(newHead.row, newHead.col).setAsSnake();
 
 	  }
   }
