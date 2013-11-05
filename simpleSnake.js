@@ -1,11 +1,12 @@
 ;(function(){
-  var GridBox = function(row, col, width, height){
+  var GridBox = function(row, col, gridView){
 	  this.row = row;
 	  this.col = col;
-	  this.width = width;
-	  this.height = height;
+    this.gridView = gridView;
     this.food = false;
 	  this.collideable = false;
+  }
+
   GridBox.prototype = {
     setAsFood: function() {
       this.collideable = true;
@@ -29,7 +30,6 @@
     }
   };
 
-	  this.render = function(color){
   var GridView = function(colWidth, rowHeight, backgroundColor) {
     this.renderBox = function(box, color) {
 		  context.fillStyle = color;
@@ -43,7 +43,7 @@
     };
   };
 
-  var GridModel = function(rows, cols, colWidth, rowHeight){
+  var GridModel = function(rows, cols, gridView){
 	  this.rows = rows;
 	  this.cols = cols;
 
@@ -53,7 +53,7 @@
 		  var currentRow = [];
 		  grid.push(currentRow);
 		  for (var col=0; col<cols; col++){
-			  var box = new GridBox(row, col, colWidth, rowHeight);
+			  var box = new GridBox(row, col, gridView);
 			  currentRow.push(box);
 			  // currentRow.collideable = (row == ( 0 || rows-1)) ? true : false;
 		  }
@@ -217,8 +217,9 @@
 	this.context = canvas.getContext('2d');
 
   var rows = 40, cols = 40;
-	this.gridModel = new GridModel(rows, cols,
-                                 canvas.height/rows, canvas.width/cols);
+  var gridView = new GridView(canvas.height/rows, canvas.width/cols,
+                              this.canvas.backgroundColor)
+	this.gridModel = new GridModel(rows, cols, gridView);
 	this.snake = new SnakeModel(10);
 
 	document.addEventListener("keydown", function(keyPress){
