@@ -4,7 +4,30 @@
 	  this.col = col;
 	  this.width = width;
 	  this.height = height;
+    this.food = false;
 	  this.collideable = false;
+  GridBox.prototype = {
+    setAsFood: function() {
+      this.collideable = true;
+      this.food = true;
+      this.gridView.renderBox(this, "blue");
+    },
+
+    setAsWall: function() {
+      this.collideable = true;
+      this.gridView.renderBox(this, "black");
+    },
+
+    setAsSnake: function() {
+      this.gridView.renderBox(this, "lime");
+    },
+
+    reset: function() {
+      this.collideable = false;
+      this.food = false;
+      this.gridView.eraseBox(this);
+    }
+  };
 
 	  this.render = function(color){
   var GridView = function(colWidth, rowHeight, backgroundColor) {
