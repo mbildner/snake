@@ -63,18 +63,20 @@
       return grid[row][col];
     };
 
-	  this.randomBox = function(){
-		  var randBox = {};
-		  randBox.collideable = true;
+    var randomBox = function() {
+			var randRow = Math.floor(Math.random()*grid.length);
+			var randCol = Math.floor(Math.random()*grid[0].length);
+			return grid[randRow][randCol];
+    };
 
-		  while (randBox.collideable){
-			  var randRow = Math.floor(Math.random()*grid.length);
-			  var randCol = Math.floor(Math.random()*grid[0].length);
-			  var randBox = grid[randRow][randCol];
+	  this.randomEmptyBox = function(){
+      var box = randomBox();
+		  while (box.collideable){
+			  box = randomBox();
 		  }
 
-		  console.log(randBox);
-		  return randBox;
+		  console.log(box);
+		  return box;
 	  }
 
 	  // Canvas setup code - put it in a this.init function
