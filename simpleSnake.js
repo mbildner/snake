@@ -16,17 +16,9 @@
 	  }
   }
 
-  var GridModel = function(canvas, rows, cols){
-
+  var GridModel = function(rows, cols, colWidth, rowHeight){
 	  this.rows = rows;
 	  this.cols = cols;
-
-	  var rowHeight = canvas.height/rows;
-	  var colWidth = canvas.width/cols;
-
-
-	  this.colWidth = colWidth;
-	  this.rowHeight = rowHeight;
 
 	  this.grid = [];
 
@@ -193,7 +185,10 @@
 	this.canvas = document.getElementById('snakeGameCanvas');
 	this.canvas.backgroundColor = "white";
 	this.context = canvas.getContext('2d');
-	this.gridModel = new GridModel(canvas, 40, 40 );
+
+  var rows = 40, cols = 40;
+	this.gridModel = new GridModel(rows, cols,
+                                 canvas.height/rows, canvas.width/cols);
 	this.snake = new SnakeModel(canvas, 10);
 
 	document.addEventListener("keydown", function(keyPress){
