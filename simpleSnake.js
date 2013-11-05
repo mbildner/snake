@@ -76,7 +76,7 @@
 
 
 
-  var SnakeModel = function(canvas, snakeLength){
+  var SnakeModel = function(snakeLength){
 	  // this.body = [];
 
 	  // for (var bodyBlock=0; bodyBlock<snakeLength; bodyBlock++){
@@ -189,7 +189,7 @@
   var rows = 40, cols = 40;
 	this.gridModel = new GridModel(rows, cols,
                                  canvas.height/rows, canvas.width/cols);
-	this.snake = new SnakeModel(canvas, 10);
+	this.snake = new SnakeModel(10);
 
 	document.addEventListener("keydown", function(keyPress){
 		snake.direction = keyPress.keyIdentifier;
