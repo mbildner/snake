@@ -59,19 +59,19 @@
       return grid[row][col];
     };
 
-    var randomBox = function() {
+    this.randomBox = function() {
 			var randRow = Math.floor(Math.random()*grid.length);
 			var randCol = Math.floor(Math.random()*grid[0].length);
 			return grid[randRow][randCol];
     };
 
-	  this.randomEmptyBox = function(){
-      var box = randomBox();
+  GridModel.prototype = {
+	  randomEmptyBox: function(){
+      var box = this.randomBox();
 		  while (box.collideable){
 			  box = randomBox();
 		  }
 
-		  console.log(box);
 		  return box;
 	  }
 
@@ -94,6 +94,7 @@
 	  var foodBlock = this.randomEmptyBox();
 	  foodBlock.setAsFood();
   }
+  };
 
   var SnakeModel = function(gridModel, snakeLength){
     this.gridModel = gridModel;
