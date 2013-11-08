@@ -52,7 +52,6 @@
 		  for (var col=0; col<cols; col++){
 			  var box = new GridBox(row, col, gridView);
 			  currentRow.push(box);
-			  // currentRow.collideable = (row == ( 0 || rows-1)) ? true : false;
 		  }
 	  }
 
@@ -97,21 +96,12 @@
   }
 
   var SnakeModel = function(snakeLength){
-	  // this.body = [];
-
-	  // for (var bodyBlock=0; bodyBlock<snakeLength; bodyBlock++){
-	  // 	this.body.push({});
-	  // }
-
-
 	  this.directionsDict = {
 		  "Up": {"col": -1, "row":0},
 		  "Down":{"col": 1, "row":0},
 		  "Left": {"col": 0, "row":-1},
 		  "Right": {"col": 0, "row":1}
 	  }
-
-
 
 	  this.body = [
 		  {row:1,col:3},
@@ -120,7 +110,6 @@
 		  {row:1,col:6},
 		  {row:1,col:7},
 		];
-
 
 	  this.collisionCheck = function(){
 		  head = this.body[0];
@@ -165,13 +154,6 @@
 		  var tail = this.body.pop();
 
 		  gridModel.getBox(tail.row, tail.col).reset();
-
-		  // var directionsDict = {
-		  // 	"Left": {"col": -1, "row":0},
-		  // 	"Right":{"col": 1, "row":0},
-		  // 	"Up": {"col": 0, "row":-1},
-		  // 	"Down": {"col": 0, "row":1}
-		  // }
 
 		  // Hack to get around weird grid inversion
 
