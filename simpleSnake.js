@@ -121,7 +121,7 @@
 		  if (collision){
 			  if (headGridBox.food){
 				  // grow the snake; it ate food
-				  snake.grow();
+				  this.grow();
 				  // set the food key to false and reset it randomly
 				  headGridBox.reset();
 				  this.gridModel.createNewFoodBlock();
@@ -171,24 +171,26 @@
 	  }
   };
 
-	var canvas = document.getElementById('snakeGameCanvas');
-	canvas.backgroundColor = "white";
+  (function startGame() {
+	  var canvas = document.getElementById('snakeGameCanvas');
+	  canvas.backgroundColor = "white";
 
-  var rows = 40, cols = 40;
-  var gridView = new GridView(canvas.getContext('2d'),
-                              canvas.height/rows, canvas.width/cols,
-                              canvas.backgroundColor)
-	var gridModel = new GridModel(rows, cols, gridView);
-	var snake = new SnakeModel(gridModel, 10);
-	document.addEventListener("keydown", function(keyPress){
-		snake.direction = keyPress.keyIdentifier;
-	});
+    var rows = 40, cols = 40;
+    var gridView = new GridView(canvas.getContext('2d'),
+                                canvas.height/rows, canvas.width/cols,
+                                canvas.backgroundColor)
+	  var gridModel = new GridModel(rows, cols, gridView);
+	  var snake = new SnakeModel(gridModel, 10);
+	  document.addEventListener("keydown", function(keyPress){
+		  snake.direction = keyPress.keyIdentifier;
+	  });
 
-  var gameLoop = function(){
-	  snake.move(snake.direction);
-	  snake.head = snake.body[0];
-	  snake.collisionCheck(gridModel);
-  }
+    var gameLoop = function(){
+	    snake.move(snake.direction);
+	    snake.head = snake.body[0];
+	    snake.collisionCheck(gridModel);
+    }
 
-  var gameLoopHandle = window.setInterval(gameLoop, 50);
+    var gameLoopHandle = window.setInterval(gameLoop, 50);
+  })();
 })(this)
