@@ -97,12 +97,7 @@
 
   var SnakeModel = function(gridModel, snakeLength){
     this.gridModel = gridModel;
-	  this.directionsDict = {
-		  "Up": {"col": -1, "row":0},
-		  "Down":{"col": 1, "row":0},
-		  "Left": {"col": 0, "row":-1},
-		  "Right": {"col": 0, "row":1}
-	  }
+	  this.direction = "Right";
 
 	  this.body = [
 		  {row:1,col:3},
@@ -112,7 +107,14 @@
 		  {row:1,col:7},
 		];
 
-	  this.collisionCheck = function(){
+	  this.body.forEach(function(block){
+		  var gridBox = gridModel.getBox(block.row, block.col);
+		  gridBox.setAsSnake();
+	  })
+  }
+
+  SnakeModel.prototype = {
+	  collisionCheck: function(){
 		  var head = this.body[0];
 		  var headGridBox = this.gridModel.getBox(head.row, head.col);
 		  var collision = headGridBox.collideable;
@@ -130,30 +132,9 @@
 				  alert("God you suck at snake");
 			  }
 		  }
-	  }
+	  },
 
-	  this.grow = function(){
-		  var tail = this.body[this.body.length-1];
-		  var directionDelta = this.directionsDict[this.direction];
-		  var newTail = {
-			  "row": tail.row + directionDelta.row,
-			  "col": tail.col + directionDelta.col
-		  }
-
-		  this.body.push(newTail);
-		  var newTailBlock = this.gridModel.getBox(newTail.row, newTail.col);
-		  newTailBlock.setAsSnake();
-	  }
-
-	  this.direction = "Right";
-
-    var self = this;
-	  this.body.forEach(function(block){
-		  var gridBox = self.gridModel.getBox(block.row, block.col);
-		  gridBox.setAsSnake();
-	  })
-
-	  this.move = function(direction){
+	  move: function(direction){
 		  var tail = this.body.pop();
 
 		  this.gridModel.getBox(tail.row, tail.col).reset();
@@ -179,9 +160,28 @@
 		  this.body = [newHead].concat(this.body);
 
 		  this.gridModel.getBox(newHead.row, newHead.col).setAsSnake();
+	  },
 
+	  directionsDict: {
+		  "Up": {"col": -1, "row":0},
+		  "Down":{"col": 1, "row":0},
+		  "Left": {"col": 0, "row":-1},
+		  "Right": {"col": 0, "row":1}
+	  },
+
+	  grow: function(){
+		  var tail = this.body[this.body.length-1];
+		  var directionDelta = this.directionsDict[this.direction];
+		  var newTail = {
+			  "row": tail.row + directionDelta.row,
+			  "col": tail.col + directionDelta.col
+		  }
+
+		  this.body.push(newTail);
+		  var newTailBlock = this.gridModel.getBox(newTail.row, newTail.col);
+		  newTailBlock.setAsSnake();
 	  }
-  }
+  };
 
 	this.canvas = document.getElementById('snakeGameCanvas');
 	this.canvas.backgroundColor = "white";
