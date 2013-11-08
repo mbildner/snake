@@ -171,13 +171,13 @@
 	  }
   };
 
-	this.canvas = document.getElementById('snakeGameCanvas');
-	this.canvas.backgroundColor = "white";
+	var canvas = document.getElementById('snakeGameCanvas');
+	canvas.backgroundColor = "white";
 	this.context = canvas.getContext('2d');
 
   var rows = 40, cols = 40;
   var gridView = new GridView(canvas.height/rows, canvas.width/cols,
-                              this.canvas.backgroundColor)
+                              canvas.backgroundColor)
 	var gridModel = new GridModel(rows, cols, gridView);
 	var snake = new SnakeModel(gridModel, 10);
   console.log(this)
