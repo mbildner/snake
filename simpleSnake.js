@@ -65,6 +65,13 @@
 			return grid[randRow][randCol];
     };
 
+    this.setUpWalls(grid);
+
+	  // set a block to have food, make it collideable, and render it blue
+	  var foodBlock = this.randomEmptyBox();
+	  foodBlock.setAsFood();
+  };
+
   GridModel.prototype = {
 	  randomEmptyBox: function(){
       var box = this.randomBox();
@@ -73,27 +80,22 @@
 		  }
 
 		  return box;
-	  }
+	  },
 
-	  // Canvas setup code - put it in a this.init function
+    setUpWalls: function(grid) {
+	    grid[0].forEach(function(box){
+		    box.setAsWall()
+	    });
 
-	  grid[0].forEach(function(box){
-		  box.setAsWall()
-	  });
+	    grid[grid.length-1].forEach(function(box){
+		    box.setAsWall()
+	    });
 
-	  grid[grid.length-1].forEach(function(box){
-		  box.setAsWall()
-	  });
-
-	  grid.forEach(function(row){
-      row[0].setAsWall();
-      row[row.length-1].setAsWall();
-	  });
-
-	  // set a block to have food, make it collideable, and render it blue
-	  var foodBlock = this.randomEmptyBox();
-	  foodBlock.setAsFood();
-  }
+	    grid.forEach(function(row){
+        row[0].setAsWall();
+        row[row.length-1].setAsWall();
+	    });
+    }
   };
 
   var SnakeModel = function(gridModel, snakeLength){
