@@ -66,21 +66,18 @@
     };
 
     this.setUpWalls(grid);
-
-	  // set a block to have food, make it collideable, and render it blue
-	  var foodBlock = this.randomEmptyBox();
-	  foodBlock.setAsFood();
+	  this.createNewFoodBlock();
   };
 
   GridModel.prototype = {
-	  randomEmptyBox: function(){
+    createNewFoodBlock: function() {
       var box = this.randomBox();
 		  while (box.collideable){
 			  box = randomBox();
 		  }
 
-		  return box;
-	  },
+	    box.setAsFood();
+    },
 
     setUpWalls: function(grid) {
 	    grid[0].forEach(function(box){
@@ -127,8 +124,7 @@
 				  snake.grow();
 				  // set the food key to false and reset it randomly
 				  headGridBox.reset();
-				  var newFood = this.gridModel.randomEmptyBox();
-          newFood.setAsFood();
+				  this.gridModel.createNewFoodBlock();
 			  } else {
 				  // kill the snake, it hit something it shouldn't
 				  window.clearInterval(gameLoopHandle);
