@@ -112,7 +112,7 @@
 		];
 
 	  this.collisionCheck = function(){
-		  head = this.body[0];
+		  var head = this.body[0];
 		  var headGridBox = gridModel.getBox(head.row, head.col);
 		  var collision = headGridBox.collideable;
 		  if (collision){
