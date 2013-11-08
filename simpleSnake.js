@@ -30,7 +30,7 @@
     }
   };
 
-  var GridView = function(colWidth, rowHeight, backgroundColor) {
+  var GridView = function(context, colWidth, rowHeight, backgroundColor) {
     this.renderBox = function(box, color) {
 		  context.fillStyle = color;
 		  context.fillRect(box.row*rowHeight, box.col*colWidth,
@@ -173,10 +173,10 @@
 
 	var canvas = document.getElementById('snakeGameCanvas');
 	canvas.backgroundColor = "white";
-	this.context = canvas.getContext('2d');
 
   var rows = 40, cols = 40;
-  var gridView = new GridView(canvas.height/rows, canvas.width/cols,
+  var gridView = new GridView(canvas.getContext('2d'),
+                              canvas.height/rows, canvas.width/cols,
                               canvas.backgroundColor)
 	var gridModel = new GridModel(rows, cols, gridView);
 	var snake = new SnakeModel(gridModel, 10);
