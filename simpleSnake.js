@@ -180,7 +180,6 @@
                               canvas.backgroundColor)
 	var gridModel = new GridModel(rows, cols, gridView);
 	var snake = new SnakeModel(gridModel, 10);
-  console.log(this)
 	document.addEventListener("keydown", function(keyPress){
 		snake.direction = keyPress.keyIdentifier;
 	});
