@@ -179,8 +179,8 @@
   var gridView = new GridView(canvas.height/rows, canvas.width/cols,
                               this.canvas.backgroundColor)
 	var gridModel = new GridModel(rows, cols, gridView);
-	this.snake = new SnakeModel(gridModel, 10);
-
+	var snake = new SnakeModel(gridModel, 10);
+  console.log(this)
 	document.addEventListener("keydown", function(keyPress){
 		snake.direction = keyPress.keyIdentifier;
 	});
