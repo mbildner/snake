@@ -95,7 +95,8 @@
 	  foodBlock.setAsFood();
   }
 
-  var SnakeModel = function(snakeLength){
+  var SnakeModel = function(gridModel, snakeLength){
+    this.gridModel = gridModel;
 	  this.directionsDict = {
 		  "Up": {"col": -1, "row":0},
 		  "Down":{"col": 1, "row":0},
@@ -113,7 +114,7 @@
 
 	  this.collisionCheck = function(){
 		  var head = this.body[0];
-		  var headGridBox = gridModel.getBox(head.row, head.col);
+		  var headGridBox = this.gridModel.getBox(head.row, head.col);
 		  var collision = headGridBox.collideable;
 		  if (collision){
 			  if (headGridBox.food){
@@ -121,7 +122,7 @@
 				  snake.grow();
 				  // set the food key to false and reset it randomly
 				  headGridBox.reset();
-				  var newFood = gridModel.randomEmptyBox();
+				  var newFood = this.gridModel.randomEmptyBox();
           newFood.setAsFood();
 			  } else {
 				  // kill the snake, it hit something it shouldn't
@@ -140,20 +141,22 @@
 		  }
 
 		  this.body.push(newTail);
-		  var newTailBlock = gridModel.getBox(newTail.row, newTail.col);
+		  var newTailBlock = this.gridModel.getBox(newTail.row, newTail.col);
 		  newTailBlock.setAsSnake();
 	  }
 
 	  this.direction = "Right";
+
+    var self = this;
 	  this.body.forEach(function(block){
-		  var gridBox = gridModel.getBox(block.row, block.col);
+		  var gridBox = self.gridModel.getBox(block.row, block.col);
 		  gridBox.setAsSnake();
 	  })
 
 	  this.move = function(direction){
 		  var tail = this.body.pop();
 
-		  gridModel.getBox(tail.row, tail.col).reset();
+		  this.gridModel.getBox(tail.row, tail.col).reset();
 
 		  // Hack to get around weird grid inversion
 
@@ -175,7 +178,7 @@
 		  newHead.col += this.directionsDict[direction]["col"];
 		  this.body = [newHead].concat(this.body);
 
-		  gridModel.getBox(newHead.row, newHead.col).setAsSnake();
+		  this.gridModel.getBox(newHead.row, newHead.col).setAsSnake();
 
 	  }
   }
@@ -187,8 +190,8 @@
   var rows = 40, cols = 40;
   var gridView = new GridView(canvas.height/rows, canvas.width/cols,
                               this.canvas.backgroundColor)
-	this.gridModel = new GridModel(rows, cols, gridView);
-	this.snake = new SnakeModel(10);
+	var gridModel = new GridModel(rows, cols, gridView);
+	this.snake = new SnakeModel(gridModel, 10);
 
 	document.addEventListener("keydown", function(keyPress){
 		snake.direction = keyPress.keyIdentifier;
@@ -197,7 +200,7 @@
   var gameLoop = function(){
 	  snake.move(snake.direction);
 	  snake.head = snake.body[0];
-	  snake.collisionCheck();
+	  snake.collisionCheck(gridModel);
   }
 
   var gameLoopHandle = window.setInterval(gameLoop, 50);
