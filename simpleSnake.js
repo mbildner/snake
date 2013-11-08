@@ -138,18 +138,7 @@
 		  var tail = this.body.pop();
 
 		  this.gridModel.getBox(tail.row, tail.col).reset();
-
-		  // Hack to get around weird grid inversion
-
-		  var directionsDict = {
-			  "Up": {"col": -1, "row":0},
-			  "Down":{"col": 1, "row":0},
-			  "Left": {"col": 0, "row":-1},
-			  "Right": {"col": 0, "row":1}
-		  }
-
 		  var oldHead = this.body[0];
-
 		  var newHead = {
 			  "row": oldHead.row,
 			  "col": oldHead.col
