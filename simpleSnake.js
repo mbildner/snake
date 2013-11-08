@@ -1,213 +1,196 @@
-var GridBox = function(row, col, width, height){
-	this.row = row;
-	this.col = col;
-	this.width = width;
-	this.height = height;
-	this.collideable = false;
+;(function(){
+  var GridBox = function(row, col, gridView){
+	  this.row = row;
+	  this.col = col;
+    this.gridView = gridView;
+    this.food = false;
+	  this.collideable = false;
+  }
 
-	this.render = function(color){
-		context.fillStyle = color;
-		context.fillRect(row*height, col*width, width, height, color)
-	}
+  GridBox.prototype = {
+    setAsFood: function() {
+      this.collideable = true;
+      this.food = true;
+      this.gridView.renderBox(this, "blue");
+    },
 
-	this.erase = function(){
-		this.render(canvas.backgroundColor);
-	}
-}
+    setAsWall: function() {
+      this.collideable = true;
+      this.gridView.renderBox(this, "black");
+    },
 
-var GridModel = function(canvas, rows, cols){
+    setAsSnake: function() {
+      this.gridView.renderBox(this, "lime");
+    },
 
-	this.rows = rows;
-	this.cols = cols;
+    reset: function() {
+      this.collideable = false;
+      this.food = false;
+      this.gridView.eraseBox(this);
+    }
+  };
 
-	var rowHeight = canvas.height/rows;
-	var colWidth = canvas.width/cols;
+  var GridView = function(context, colWidth, rowHeight, backgroundColor) {
+    this.renderBox = function(box, color) {
+		  context.fillStyle = color;
+		  context.fillRect(box.row*rowHeight, box.col*colWidth,
+                       colWidth, rowHeight,
+                       color);
+    };
 
+    this.eraseBox = function(box) {
+      this.renderBox(box, backgroundColor);
+    };
+  };
 
-	this.colWidth = colWidth;
-	this.rowHeight = rowHeight;
+  var GridModel = function(rows, cols, gridView){
+	  var grid = [];
 
-	this.grid = [];
+	  for (var row=0; row<rows; row++){
+		  var currentRow = [];
+		  grid.push(currentRow);
+		  for (var col=0; col<cols; col++){
+			  var box = new GridBox(row, col, gridView);
+			  currentRow.push(box);
+		  }
+	  }
 
-	for (var row=0; row<rows; row++){
-		var currentRow = [];
-		this.grid.push(currentRow);
-		for (var col=0; col<cols; col++){
-			var box = new GridBox(row, col, colWidth, rowHeight);
-			currentRow.push(box);
-			// currentRow.collideable = (row == ( 0 || rows-1)) ? true : false;
-		}
-	}
+    this.getBox = function(row, col) {
+      return grid[row][col];
+    };
 
+    this.randomBox = function() {
+			var randRow = Math.floor(Math.random()*grid.length);
+			var randCol = Math.floor(Math.random()*grid[0].length);
+			return grid[randRow][randCol];
+    };
 
-	this.randomBox = function(){
-		var randBox = {};
-		randBox.collideable = true;
+    this.setUpWalls(grid);
+	  this.createNewFoodBlock();
+  };
 
-		while (randBox.collideable){
-			var randRow = Math.floor(Math.random()*this.grid.length);
-			var randCol = Math.floor(Math.random()*this.grid[0].length);
-			var randBox = this.grid[randRow][randCol];
-		}
+  GridModel.prototype = {
+    createNewFoodBlock: function() {
+      var box = this.randomBox();
+		  while (box.collideable){
+			  box = randomBox();
+		  }
 
-		console.log(randBox);
-		return randBox;
-	}
+	    box.setAsFood();
+    },
 
-	// Canvas setup code - put it in a this.init function
+    setUpWalls: function(grid) {
+	    grid[0].forEach(function(box){
+		    box.setAsWall()
+	    });
 
-	// set edges to collideable and render them black
-	this.grid[0].forEach(function(box){
-		box.collideable = true;
-		box.render("black");
-	});
+	    grid[grid.length-1].forEach(function(box){
+		    box.setAsWall()
+	    });
 
-	this.grid[this.grid.length-1].forEach(function(box){
-		box.collideable = true;
-		box.render("black");
-	});
+	    grid.forEach(function(row){
+        row[0].setAsWall();
+        row[row.length-1].setAsWall();
+	    });
+    }
+  };
 
-	this.grid.forEach(function(row){
-		row[0].collideable = true;
-		row[row.length-1].collideable = true;
-		row[0].render("black");
-		row[row.length-1].render("black");
-	});
+  var SnakeModel = function(gridModel, snakeLength){
+    this.gridModel = gridModel;
+	  this.direction = "Right";
 
-	// set a block to have food, make it collideable, and render it blue
-	var foodBlock = this.randomBox();
-	foodBlock.collideable = true;
-	foodBlock.food = true;
-	foodBlock.render("blue");
-}
-
-
-
-var SnakeModel = function(canvas, snakeLength){
-	// this.body = [];
-	
-	// for (var bodyBlock=0; bodyBlock<snakeLength; bodyBlock++){
-	// 	this.body.push({});
-	// }
-
-
-	this.directionsDict = {
-		"Up": {"col": -1, "row":0},
-		"Down":{"col": 1, "row":0},
-		"Left": {"col": 0, "row":-1},
-		"Right": {"col": 0, "row":1}
-	}	
-	
-
-
-	this.body = [
-		{row:1,col:3},
-		{row:1,col:4},
-		{row:1,col:5},		
-		{row:1,col:6},		
-		{row:1,col:7},		
+	  this.body = [
+		  {row:1,col:3},
+		  {row:1,col:4},
+		  {row:1,col:5},
+		  {row:1,col:6},
+		  {row:1,col:7},
 		];
 
+	  this.body.forEach(function(block){
+		  var gridBox = gridModel.getBox(block.row, block.col);
+		  gridBox.setAsSnake();
+	  })
+  }
 
-	this.collisionCheck = function(){
-		head = this.body[0];
-		var headGridBox = gridModel.grid[head.row][head.col];
-		var collision = headGridBox.collideable;
-		if (collision){
-			if (headGridBox.food){
-				// grow the snake; it ate food
-				snake.grow();
-				// set the food key to false and reset it randomly
-				headGridBox.food = false;
-				headGridBox.collideable = false;
-				var newFood = gridModel.randomBox();
-				newFood.collideable = true;
-				newFood.food = true;
-				newFood.render("blue");
-			} else {
-				// kill the snake, it hit something it shouldn't
-				window.clearInterval(gameLoopHandle);
-				alert("God you suck at snake");
-			}
-		}
-	}
+  SnakeModel.prototype = {
+	  collisionCheck: function(){
+		  var head = this.body[0];
+		  var headGridBox = this.gridModel.getBox(head.row, head.col);
+		  var collision = headGridBox.collideable;
+		  if (collision){
+			  if (headGridBox.food){
+				  // grow the snake; it ate food
+				  this.grow();
+				  // set the food key to false and reset it randomly
+				  headGridBox.reset();
+				  this.gridModel.createNewFoodBlock();
+			  } else {
+				  // kill the snake, it hit something it shouldn't
+				  window.clearInterval(gameLoopHandle);
+				  alert("God you suck at snake");
+			  }
+		  }
+	  },
 
-	this.grow = function(){
-		var tail = this.body[this.body.length-1];
-		var directionDelta = this.directionsDict[this.direction];
-		var newTail = {
-			"row": tail.row + directionDelta.row,
-			"col": tail.col + directionDelta.col
-		}
+	  move: function(direction){
+		  var tail = this.body.pop();
 
-		this.body.push(newTail);
-		var newTailBlock = gridModel.grid[newTail.row][newTail.col];
-		newTailBlock.render("lime");
+		  this.gridModel.getBox(tail.row, tail.col).reset();
+		  var oldHead = this.body[0];
+		  var newHead = {
+			  "row": oldHead.row,
+			  "col": oldHead.col
+		  };
 
-	}
+		  newHead.row += this.directionsDict[direction]["row"];
+		  newHead.col += this.directionsDict[direction]["col"];
+		  this.body = [newHead].concat(this.body);
 
-	this.direction = "Right";
-	this.body.forEach(function(block){
-		var gridBox = gridModel.grid[block.row][block.col];
-		gridBox.render("lime");
-	})
+		  this.gridModel.getBox(newHead.row, newHead.col).setAsSnake();
+	  },
 
-	this.move = function(direction){
-		var tail = this.body.pop();
+	  directionsDict: {
+		  "Up": {"col": -1, "row":0},
+		  "Down":{"col": 1, "row":0},
+		  "Left": {"col": 0, "row":-1},
+		  "Right": {"col": 0, "row":1}
+	  },
 
-		gridModel.grid[tail.row][tail.col].erase();
+	  grow: function(){
+		  var tail = this.body[this.body.length-1];
+		  var directionDelta = this.directionsDict[this.direction];
+		  var newTail = {
+			  "row": tail.row + directionDelta.row,
+			  "col": tail.col + directionDelta.col
+		  }
 
-		// var directionsDict = {
-		// 	"Left": {"col": -1, "row":0},
-		// 	"Right":{"col": 1, "row":0},
-		// 	"Up": {"col": 0, "row":-1},
-		// 	"Down": {"col": 0, "row":1}
-		// }
+		  this.body.push(newTail);
+		  var newTailBlock = this.gridModel.getBox(newTail.row, newTail.col);
+		  newTailBlock.setAsSnake();
+	  }
+  };
 
-		// Hack to get around weird grid inversion
+  (function startGame() {
+	  var canvas = document.getElementById('snakeGameCanvas');
+	  canvas.backgroundColor = "white";
 
-		var directionsDict = {
-			"Up": {"col": -1, "row":0},
-			"Down":{"col": 1, "row":0},
-			"Left": {"col": 0, "row":-1},
-			"Right": {"col": 0, "row":1}
-		}	
+    var rows = 40, cols = 40;
+    var gridView = new GridView(canvas.getContext('2d'),
+                                canvas.height/rows, canvas.width/cols,
+                                canvas.backgroundColor)
+	  var gridModel = new GridModel(rows, cols, gridView);
+	  var snake = new SnakeModel(gridModel, 10);
+	  document.addEventListener("keydown", function(keyPress){
+		  snake.direction = keyPress.keyIdentifier;
+	  });
 
-		var oldHead = this.body[0];
-		
-		var newHead = {
-			"row": oldHead.row,
-			"col": oldHead.col
-		};		
+    var gameLoop = function(){
+	    snake.move(snake.direction);
+	    snake.head = snake.body[0];
+	    snake.collisionCheck(gridModel);
+    }
 
-		newHead.row += this.directionsDict[direction]["row"];
-		newHead.col += this.directionsDict[direction]["col"];
-		this.body = [newHead].concat(this.body);
-
-		gridModel.grid[newHead.row][newHead.col].render("lime");
-
-	}
-}
-
-;(function(){	
-	this.canvas = document.getElementById('snakeGameCanvas');
-	this.canvas.backgroundColor = "white";
-	this.context = canvas.getContext('2d');
-	this.gridModel = new GridModel(canvas, 40, 40 );	
-	this.snake = new SnakeModel(canvas, 10);
-	
-	document.addEventListener("keydown", function(keyPress){
-		snake.direction = keyPress.keyIdentifier;
-	});
-	
+    var gameLoopHandle = window.setInterval(gameLoop, 50);
+  })();
 })(this)
-
-
-var gameLoop = function(){
-	snake.move(snake.direction);
-	snake.head = snake.body[0];
-	snake.collisionCheck();
-
-}
-
-var gameLoopHandle = window.setInterval(gameLoop, 50);
