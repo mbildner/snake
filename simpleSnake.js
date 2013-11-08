@@ -44,9 +44,6 @@
   };
 
   var GridModel = function(rows, cols, gridView){
-	  this.rows = rows;
-	  this.cols = cols;
-
 	  var grid = [];
 
 	  for (var row=0; row<rows; row++){
@@ -98,8 +95,6 @@
 	  var foodBlock = this.randomEmptyBox();
 	  foodBlock.setAsFood();
   }
-
-
 
   var SnakeModel = function(snakeLength){
 	  // this.body = [];
